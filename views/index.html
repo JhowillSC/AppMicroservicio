@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Conversor de Monedas</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>💱 Conversor</h1>
+      <form id="form-conversion">
+        <div class="form-group">
+          <label for="cantidad">💰 Cantidad:</label>
+          <input
+            type="number"
+            name="cantidad"
+            id="cantidad"
+            required
+            step="0.01"
+            min="0"
+            placeholder="Ingresa la cantidad"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="monedaOrigen">🏦 Moneda de origen:</label>
+          <select name="monedaOrigen" id="monedaOrigen">
+            <option value="PEN">🇵🇪 PEN - Sol Peruano</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="monedaDestino">🎯 Moneda de destino:</label>
+          <select name="monedaDestino" id="monedaDestino">
+            <option value="USD">🇺🇸 USD - Dólar Estadounidense</option>
+            <option value="EUR">🇪🇺 EUR - Euro</option>
+            <option value="PEN">🇵🇪 PEN - Sol Peruano</option>
+          </select>
+        </div>
+
+        <button type="submit">🔄 Convertir Moneda</button>
+      </form>
+
+      <div id="resultado" class="mensaje-resultado"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById("form-conversion")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault(); // evita que recargue la página
+
+          const cantidad = document.getElementById("cantidad").value;
+          const monedaOrigen = document.getElementById("monedaOrigen").value;
+          const monedaDestino = document.getElementById("monedaDestino").value;
+
+          // Agregar clase de carga
+          document.querySelector(".container").classList.add("loading");
+
+          const response = await fetch("/convertir", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({
+              cantidad,
+              monedaOrigen,
+              monedaDestino,
+            }),
+          });
+
+          const data = await response.json();
+          const resultadoDiv = document.getElementById("resultado");
+
+          // Remover clase de carga
+          document.querySelector(".container").classList.remove("loading");
+
+          if (data.exito) {
+            resultadoDiv.innerHTML = `
+                        <p class="exito">✅ ${data.mensaje}</p>
+                        <p class="resultado">💵 ${data.resultado}</p>
+                    `;
+          } else {
+            resultadoDiv.innerHTML = `<p class="error">❌ ${data.mensaje}</p>`;
+          }
+        });
+    </script>
+  </body>
+</html>
